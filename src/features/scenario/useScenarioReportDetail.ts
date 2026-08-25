@@ -43,9 +43,6 @@ type RawDetailRow = {
   }[];
 };
 
-// character_disclosure がこの値のときは、役名を伏せてネタバレを防ぐ
-const HIDDEN_DISCLOSURE_VALUES = new Set(["非公開", "秘匿"]);
-
 export function useScenarioReportDetail(scheduleId: string | undefined) {
   const [detail, setDetail] = useState<ScenarioReportDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,21 +107,39 @@ export function useScenarioReportDetail(scheduleId: string | undefined) {
         throw supabaseError;
       }
 
-      const isHidden = data.scenarios?.character_disclosure
-        ? HIDDEN_DISCLOSURE_VALUES.has(data.scenarios.character_disclosure)
-        : false;
+      // 公開条件の判定
+      const disclosure = data.scenarios?.character_disclosure;
+      const hideAll = disclosure === "公開NG" || disclosure === "非公開";
+      const hideNameOnly = disclosure === "順番のみ公開OK" || disclosure === "秘匿";
 
       const cast = (data.schedule_participants ?? [])
-        .map((p) => ({
-          participantId: p.id,
-          profileId: p.profile_id,
-          profileName: p.profiles?.name ?? "名前非公開",
-          profileIconUrl: p.profiles?.icon_url ?? null,
-          role: p.role,
-          characterName: isHidden ? null : p.scenario_characters?.character_name ?? null,
-          characterType: isHidden ? null : p.scenario_characters?.type ?? null,
-          characterNumber: isHidden ? null : p.scenario_characters?.character_number ?? null,
-        }))
+        .map((p) => {
+          // 公開NGの場合は全フィールドを null にする
+          if (hideAll) {
+            return {
+              participantId: p.id,
+              profileId: p.profile_id,
+              profileName: p.profiles?.name ?? "-",
+              profileIconUrl: p.profiles?.icon_url ?? null,
+              role: p.role,
+              characterName: "<非公開>",
+              characterType: null,
+              characterNumber: null,
+            };
+          }
+
+          // 順番のみ公開OKの場合は characterName のみ null にする
+          return {
+            participantId: p.id,
+            profileId: p.profile_id,
+            profileName: p.profiles?.name ?? "-",
+            profileIconUrl: p.profiles?.icon_url ?? null,
+            role: p.role,
+            characterName: hideNameOnly ? null : p.scenario_characters?.character_name ?? null,
+            characterType: p.scenario_characters?.type ?? null,
+            characterNumber: p.scenario_characters?.character_number ?? null,
+          };
+        })
         // PC/HO番号順 → 番号なしは後ろへ
         .sort((a, b) => {
           if (a.characterNumber == null && b.characterNumber == null) return 0;
