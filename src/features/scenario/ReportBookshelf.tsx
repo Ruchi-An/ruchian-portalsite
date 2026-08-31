@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Sparkles,
   BookX,
@@ -88,12 +88,48 @@ function BookCard({
 }
 
 export default function ReportBookshelf() {
-  const location = useLocation();
   const { reports, loading, error } = useScenarioReports();
-  const initialViewMode = (location.state as { returnView?: ViewMode } | null)?.returnView ?? "bookshelf";
-  const [activeGenre, setActiveGenre] = useState<GenreFilter>("all");
-  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeGenre, setActiveGenre] = useState<GenreFilter>(() => {
+    const genreParam = searchParams.get("genre");
+    if (genreParam === "murder" || genreParam === "story" || genreParam === "other") {
+      return genreParam;
+    }
+    return "all";
+  });
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    searchParams.get("view") === "list" ? "list" : "bookshelf"
+  );
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams(searchParams);
+    let shouldUpdate = false;
+
+    if (activeGenre === "all") {
+      if (nextParams.has("genre")) {
+        nextParams.delete("genre");
+        shouldUpdate = true;
+      }
+    } else if (nextParams.get("genre") !== activeGenre) {
+      nextParams.set("genre", activeGenre);
+      shouldUpdate = true;
+    }
+
+    if (viewMode === "bookshelf") {
+      if (nextParams.has("view")) {
+        nextParams.delete("view");
+        shouldUpdate = true;
+      }
+    } else if (nextParams.get("view") !== "list") {
+      nextParams.set("view", "list");
+      shouldUpdate = true;
+    }
+
+    if (shouldUpdate) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [activeGenre, viewMode, searchParams, setSearchParams]);
 
   const displayReports = useMemo(() => {
     return reports
@@ -181,7 +217,7 @@ export default function ReportBookshelf() {
                 key={report.scheduleId}
                 type="button"
                 className={`report-list-row ${rowTheme === "murder" ? "list-murder" : rowTheme === "story" ? "list-story" : "list-other"}`}
-                onClick={() => navigate(`/scenario/report/${report.scheduleId}`, { state: { returnView: viewMode } })}
+                onClick={() => navigate(`/scenario/report/${report.scheduleId}`, { state: { returnTo: `${window.location.pathname}${window.location.search}` } })}
               >
                 <span className="report-list-number font-yomogi">#{report.number}</span>
                 <span className="report-list-date font-yomogi">{report.date}</span>
@@ -200,7 +236,7 @@ export default function ReportBookshelf() {
               title={report.title}
               endcardUrl={report.endcardUrl}
               genre={report.genre}
-              onClick={() => navigate(`/scenario/report/${report.scheduleId}`, { state: { returnView: viewMode } })}
+              onClick={() => navigate(`/scenario/report/${report.scheduleId}`, { state: { returnTo: `${window.location.pathname}${window.location.search}` } })}
             />
           ))}
         </div>

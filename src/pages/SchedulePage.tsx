@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSchedules } from "../hooks/useSchedules";
 import ScheduleCalendar from "../components/calendar/ScheduleCalendar";
 import ScheduleCard from "../components/schedule/ScheduleCard";
@@ -51,8 +52,41 @@ function ScheduleList({
 // -------------------------------------------------------------
 export default function SchedulePage() {
   const { schedules = [], loading } = useSchedules();
-  const [activeTab, setActiveTab] = useState<"past" | "calendar" | "future">("calendar");
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<"past" | "calendar" | "future">(() => {
+    const tabParam = searchParams.get("tab");
+    return tabParam === "past" || tabParam === "future" ? tabParam : "calendar";
+  });
+  const [selectedDate, setSelectedDate] = useState<string | null>(() => searchParams.get("date") ?? null);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams(searchParams);
+    let shouldUpdate = false;
+
+    if (activeTab === "calendar") {
+      if (nextParams.has("tab")) {
+        nextParams.delete("tab");
+        shouldUpdate = true;
+      }
+    } else if (nextParams.get("tab") !== activeTab) {
+      nextParams.set("tab", activeTab);
+      shouldUpdate = true;
+    }
+
+    if (!selectedDate) {
+      if (nextParams.has("date")) {
+        nextParams.delete("date");
+        shouldUpdate = true;
+      }
+    } else if (nextParams.get("date") !== selectedDate) {
+      nextParams.set("date", selectedDate);
+      shouldUpdate = true;
+    }
+
+    if (shouldUpdate) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [activeTab, selectedDate, searchParams, setSearchParams]);
 
   // 日付フィルタリング・ソートの計算ロジック
   const { selectedDateSchedules, pastSchedules, futureSchedules } = useMemo(() => {

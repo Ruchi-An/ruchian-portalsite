@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { Schedule } from "../../types/schedule";
 import "./ScheduleCard.css";
 import { 
@@ -48,6 +48,7 @@ type Props = {
 
 export default function ScheduleCard({ schedule }: Props) {
   console.log("scheduleの中身:", schedule);
+  const location = useLocation();
   const [isImageOpen, setIsImageOpen] = useState(false);
   const isReal = schedule.category === "リアル";
 
@@ -59,6 +60,11 @@ export default function ScheduleCard({ schedule }: Props) {
       : null;
 
   const genre = schedule.scenarios?.genre ?? schedule.games?.genre;
+  const todayStr = new Date().toISOString().split("T")[0];
+  const isFutureReportDisabled =
+    schedule.category === "シナリオ" &&
+    schedule.role === "PL" &&
+    (!schedule.date || schedule.date > todayStr);
 
   // シナリオ詳細画面へのパス
   const scheduleId = schedule.id;
@@ -215,21 +221,30 @@ export default function ScheduleCard({ schedule }: Props) {
               {/* --- 詳細ボタン（分類＝シナリオ かつ 担当＝PL のとき） --- */}
               {schedule.category === "シナリオ" && schedule.role === "PL" && (
                 scheduleId ? (
-                  <Link
-                    to={`/scenario/report/${scheduleId}`}
-                    className="schedule-btn schedule-btn-detail"
-                  >
-                    <FileText size={14} />
-                    <span className="btn-text-short">報告</span>
-                    <span className="btn-text-full">通過報告</span>
-                  </Link>
-                ) : (
-                  <span className="schedule-btn schedule-btn-disabled">
-                    <FileText size={14} />
-                    <span className="btn-text-short">報告</span>
-                    <span className="btn-text-full">通過報告</span>
-                  </span>
-                )
+                 isFutureReportDisabled ? (
+                   <span className="schedule-btn schedule-btn-disabled" aria-disabled="true">
+                     <FileText size={14} />
+                     <span className="btn-text-short">報告</span>
+                     <span className="btn-text-full">通過報告</span>
+                   </span>
+                 ) : (
+                   <Link
+                     to={`/scenario/report/${scheduleId}`}
+                     state={{ returnTo: `${location.pathname}${location.search}` }}
+                     className="schedule-btn schedule-btn-detail"
+                   >
+                     <FileText size={14} />
+                     <span className="btn-text-short">報告</span>
+                     <span className="btn-text-full">通過報告</span>
+                   </Link>
+                 )
+               ) : (
+                 <span className="schedule-btn schedule-btn-disabled">
+                   <FileText size={14} />
+                   <span className="btn-text-short">報告</span>
+                   <span className="btn-text-full">通過報告</span>
+                 </span>
+               )
               )}
             </div>
           )}

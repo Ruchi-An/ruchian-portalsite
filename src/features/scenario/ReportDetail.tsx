@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import {
   Sparkles,
   ArrowLeft,
@@ -21,9 +21,10 @@ import "./ReportDetail.css";
 
 export default function ReportDetail() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { scheduleId } = useParams<{ scheduleId: string }>();
   const { detail, loading, error } = useScenarioReportDetail(scheduleId);
-  const returnView = (location.state as { returnView?: "bookshelf" | "list" } | null)?.returnView ?? "bookshelf";
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? null;
 
   // 💡 画像モーダルの開閉状態
   const [isImageOpen, setIsImageOpen] = useState(false);
@@ -118,14 +119,24 @@ export default function ReportDetail() {
 
   return (
     <div className="report-detail">
-      <Link
-        to="/scenario/passed"
-        state={{ returnView }}
+      <button
+        type="button"
         className="report-back-link font-pop"
+        onClick={() => {
+          if (returnTo) {
+            navigate(returnTo);
+            return;
+          }
+          navigate(-1);
+        }}
       >
         <ArrowLeft size={16} />
-        {returnView === "list" ? "リストへ戻る" : "本棚に戻る"}
-      </Link>
+        {returnTo?.startsWith("/scenario/passed")
+          ? returnTo.includes("view=list")
+            ? "リストへ戻る"
+            : "本棚に戻る"
+          : "戻る"}
+      </button>
 
       {/* 詳細情報エリア */}
       <div className="report-detail-body">
