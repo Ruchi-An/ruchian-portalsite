@@ -158,7 +158,7 @@ export default function ScheduleCard({ schedule }: Props) {
                 <span>{schedule.date ?? "-"}</span>
               </div>
 
-              {!isReal && schedule.time && (
+              {schedule.time && (
                 <div className="schedule-card-meta-item">
                   <Clock size={14} className="schedule-card-icon" />
                   <span>{schedule.time ?? "-"}</span>

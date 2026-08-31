@@ -95,11 +95,34 @@ export default function SchedulePage() {
     const filterRealCategory = (list: Schedule[]) =>
       list.filter((s) => s.category !== "リアル");
 
+    const parseTimeMinutes = (time: string | null | undefined) => {
+      if (!time) return Number.MAX_SAFE_INTEGER;
+      const match = time.match(/(\d{1,2}):(\d{2})/);
+      if (!match) return Number.MAX_SAFE_INTEGER;
+      return Number(match[1]) * 60 + Number(match[2]);
+    };
+
+    const getTimeOrder = (schedule: Schedule) => {
+      if (schedule.is_morning) return 0;
+      if (schedule.is_afternoon) return 1;
+      if (schedule.is_night) return 2;
+      if (schedule.is_late_night) return 3;
+      return 4;
+    };
+
+    const sortByTimeOrder = (a: Schedule, b: Schedule) => {
+      const orderDiff = getTimeOrder(a) - getTimeOrder(b);
+      if (orderDiff !== 0) return orderDiff;
+      return parseTimeMinutes(a.time) - parseTimeMinutes(b.time);
+    };
+
     const filtered = filterRealCategory(schedules);
 
     return {
       selectedDateSchedules: selectedDate
-        ? schedules.filter((s) => s.date === selectedDate)
+        ? [...schedules]
+            .filter((s) => s.date === selectedDate)
+            .sort(sortByTimeOrder)
         : [],
 
       // 1. 過去リスト：日付があって、今日より前のものを降順（新しい順）
