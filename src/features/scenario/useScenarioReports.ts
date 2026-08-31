@@ -29,8 +29,15 @@ export function useScenarioReports() {
     setError(null);
 
     try {
+      const now = new Date();
+      const todayString = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+      ].join("-");
+
       // 種類=予定 / 分類=シナリオ / 担当=PL のスケジュールを
-      // 日付の古い順に取得（連番を振るため昇順で取得する）
+      // 今日を含まない「今日より前の日付」のみ取得し、日付の古い順に並べる
       const { data, error: supabaseError } = await supabase
         .from("schedules")
         .select(
@@ -48,6 +55,7 @@ export function useScenarioReports() {
         .eq("type", "予定")
         .eq("category", "シナリオ")
         .eq("role", "PL")
+        .lt("date", todayString)
         .order("date", { ascending: true })
         .order("created_at", { ascending: true })
         .returns<RawRow[]>();
@@ -58,8 +66,26 @@ export function useScenarioReports() {
 
       const rows = data ?? [];
 
+      // 同じタイトルの複数レコードがある場合は、日付が新しいものだけ残す
+      const latestByTitle = new Map<string, RawRow>();
+      for (const row of rows) {
+        const title = (row.scenarios?.title ?? row.title ?? "").trim();
+        if (!title) {
+          continue;
+        }
+
+        const existing = latestByTitle.get(title);
+        if (!existing || (row.date ?? "") > (existing.date ?? "")) {
+          latestByTitle.set(title, row);
+        }
+      }
+
+      const uniqueRows = Array.from(latestByTitle.values()).sort((a, b) =>
+        (a.date ?? "").localeCompare(b.date ?? "")
+      );
+
       // 古い順に連番を振ってから、表示用に新しい順へ反転する
-      const numbered: ScenarioReportListEntry[] = rows.map((row, index) => ({
+      const numbered: ScenarioReportListEntry[] = uniqueRows.map((row, index) => ({
         scheduleId: row.id,
         date: row.date,
         title: row.scenarios?.title ?? row.title,
