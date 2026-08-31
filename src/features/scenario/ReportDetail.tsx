@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import {
   Sparkles,
   ArrowLeft,
@@ -20,8 +20,10 @@ import WatermarkedImage from "../../WatermarkedImage";
 import "./ReportDetail.css";
 
 export default function ReportDetail() {
+  const location = useLocation();
   const { scheduleId } = useParams<{ scheduleId: string }>();
   const { detail, loading, error } = useScenarioReportDetail(scheduleId);
+  const returnView = (location.state as { returnView?: "bookshelf" | "list" } | null)?.returnView ?? "bookshelf";
 
   // 💡 画像モーダルの開閉状態
   const [isImageOpen, setIsImageOpen] = useState(false);
@@ -116,9 +118,13 @@ export default function ReportDetail() {
 
   return (
     <div className="report-detail">
-      <Link to="/scenario" className="report-back-link font-pop">
+      <Link
+        to="/scenario/passed"
+        state={{ returnView }}
+        className="report-back-link font-pop"
+      >
         <ArrowLeft size={16} />
-        本棚に戻る
+        {returnView === "list" ? "リストへ戻る" : "本棚に戻る"}
       </Link>
 
       {/* 詳細情報エリア */}
