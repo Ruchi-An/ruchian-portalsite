@@ -48,6 +48,7 @@ export type ScenarioReportDetail = {
   memo: string | null;
   endcardUrl: string | null;
   thumbnailUrl: string | null;
+  stream: boolean;
   streamUrl: string | null;
   scenario: ScenarioDetailInfo | null;
   cast: ReportCast[];

@@ -59,6 +59,7 @@ export default function ScheduleCard({ schedule }: Props) {
       ? schedule.scenarios?.official_url
       : null;
 
+  const isStreamEnabled = Boolean(schedule.stream) && Boolean(schedule.stream_url);
   const genre = schedule.scenarios?.genre ?? schedule.games?.genre;
   const todayStr = new Date().toISOString().split("T")[0];
   const isFutureReportDisabled =
@@ -198,9 +199,9 @@ export default function ScheduleCard({ schedule }: Props) {
               )}
 
               {/* --- 配信ボタン --- */}
-              {schedule.stream_url ? (
+              {isStreamEnabled ? (
                 <a
-                  href={schedule.stream_url}
+                  href={schedule.stream_url ?? undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleStreamClick}
@@ -211,7 +212,7 @@ export default function ScheduleCard({ schedule }: Props) {
                   <span className="btn-text-full">配信を見る</span>
                 </a>
               ) : (
-                <span className="schedule-btn schedule-btn-disabled">
+                <span className="schedule-btn schedule-btn-disabled" aria-disabled="true">
                   <Radio size={14} />
                   <span className="btn-text-short">配信</span>
                   <span className="btn-text-full">配信を見る</span>

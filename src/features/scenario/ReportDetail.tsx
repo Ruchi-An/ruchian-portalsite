@@ -84,6 +84,8 @@ export default function ReportDetail() {
     return "schedule-genre-other";
   };
 
+  const isStreamEnabled = Boolean(detail?.stream) && Boolean(detail?.streamUrl);
+
   const handleStreamClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const isConfirmed = window.confirm(
       "⚠️ ネタバレ注意 ⚠️\n\nこの配信はシナリオ（マダミス・ストプレ等）のネタバレを含みます。\n通過済み、または今後プレイ予定のない方のみご視聴ください。\n\n配信ページを開きますか？"
@@ -213,10 +215,14 @@ export default function ReportDetail() {
               <LinkIcon size={14} /> 公式ページ
             </a>
           )}
-          {detail.streamUrl && (
-            <a href={detail.streamUrl} target="_blank" rel="noopener noreferrer" onClick={handleStreamClick} className="report-detail-link-btn stream-btn">
+          {isStreamEnabled ? (
+            <a href={detail.streamUrl ?? undefined} target="_blank" rel="noopener noreferrer" onClick={handleStreamClick} className="report-detail-link-btn stream-btn">
               <Radio size={14} /> 配信を見る
             </a>
+          ) : (
+            <span className="report-detail-link-btn stream-btn-disabled" aria-disabled="true">
+              <Radio size={14} /> 配信を見る
+            </span>
           )}
         </div>
       </div>

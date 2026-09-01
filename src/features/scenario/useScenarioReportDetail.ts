@@ -9,6 +9,7 @@ type RawDetailRow = {
   memo: string | null;
   endcard_url: string | null;
   thumbnail_url: string | null;
+  stream: boolean;
   stream_url: string | null;
   scenarios: {
     title: string | null;
@@ -65,6 +66,7 @@ export function useScenarioReportDetail(scheduleId: string | undefined) {
           memo,
           endcard_url,
           thumbnail_url,
+          stream,
           stream_url,
           scenarios (
             title,
@@ -155,6 +157,7 @@ export function useScenarioReportDetail(scheduleId: string | undefined) {
         memo: data.memo,
         endcardUrl: data.endcard_url,
         thumbnailUrl: data.thumbnail_url,
+        stream: data.stream,
         streamUrl: data.stream_url,
         scenario: data.scenarios
           ? {
