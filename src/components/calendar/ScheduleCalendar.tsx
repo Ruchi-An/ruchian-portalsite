@@ -47,6 +47,7 @@ export default function ScheduleCalendar({
   const schedulesByDate = useMemo(() => {
     const map = new Map<string, Schedule[]>();
     schedules.forEach((schedule) => {
+      if (!schedule.date || schedule.date.trim() === "") return;
       const list = map.get(schedule.date) ?? [];
       list.push(schedule);
       map.set(schedule.date, list);

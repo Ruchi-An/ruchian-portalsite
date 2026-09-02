@@ -7,6 +7,7 @@ import { ScheduleTabs } from "../components/tab/ScheduleTabs";
 import { CalendarX, Sparkles } from "lucide-react";
 import type { Schedule } from "../types/schedule";
 import "../App.css";
+import Pagination, { ITEMS_PER_PAGE } from "../components/Pagination";
 
 // -------------------------------------------------------------
 // 【サブコンポーネント】カード用ネオンラッパー
@@ -31,19 +32,40 @@ function ScheduleList({
   schedules: Schedule[];
   emptyMessage: React.ReactNode;
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+
   if (schedules.length === 0) {
     return <div className="empty-schedule-box">{emptyMessage}</div>;
   }
 
+  const totalPages = Math.ceil(schedules.length / ITEMS_PER_PAGE);
+  const page = Math.min(currentPage, totalPages);
+  const visibleSchedules = schedules.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
+
   return (
-    <div className="schedule-list">
-      {schedules.map((schedule, index) => (
-        <NeonCard
-          key={schedule.id ?? `${schedule.date}-${index}`}
-          schedule={schedule}
-        />
-      ))}
-    </div>
+    <>
+      <Pagination
+        currentPage={page}
+        totalItems={schedules.length}
+        onPageChange={setCurrentPage}
+      />
+      <div className="schedule-list">
+        {visibleSchedules.map((schedule, index) => (
+          <NeonCard
+            key={schedule.id ?? `${schedule.date}-${(page - 1) * ITEMS_PER_PAGE + index}`}
+            schedule={schedule}
+          />
+        ))}
+      </div>
+      <Pagination
+        currentPage={page}
+        totalItems={schedules.length}
+        onPageChange={setCurrentPage}
+      />
+    </>
   );
 }
 
@@ -53,6 +75,7 @@ function ScheduleList({
 export default function SchedulePage() {
   const { schedules = [], loading } = useSchedules();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [showUndatedOnly, setShowUndatedOnly] = useState(false);
   const [activeTab, setActiveTab] = useState<"past" | "calendar" | "future">(() => {
     const tabParam = searchParams.get("tab");
     return tabParam === "past" || tabParam === "future" ? tabParam : "calendar";
@@ -91,6 +114,8 @@ export default function SchedulePage() {
   // 日付フィルタリング・ソートの計算ロジック
   const { selectedDateSchedules, pastSchedules, futureSchedules } = useMemo(() => {
     const todayStr = new Date().toISOString().split("T")[0];
+    const isUndated = (schedule: Schedule) =>
+      schedule.date == null || schedule.date.trim() === "";
 
     const filterRealCategory = (list: Schedule[]) =>
       list.filter((s) => s.category !== "リアル");
@@ -127,22 +152,28 @@ export default function SchedulePage() {
 
       // 1. 過去リスト：日付があって、今日より前のものを降順（新しい順）
       pastSchedules: filtered
-        .filter((s) => s.date && s.date < todayStr)
+        .filter((s) => !isUndated(s) && s.date! < todayStr)
         .sort((a, b) => b.date!.localeCompare(a.date!)),
 
       // 2. 未来リスト：今日以降の予定 ＋ 日付未定（null/なし）の予定
       futureSchedules: filtered
-        .filter((s) => !s.date || s.date >= todayStr)
+        .filter((s) => isUndated(s) || s.date! >= todayStr)
         .sort((a, b) => {
           // 日付なし（未定）は一番下に回す
-          if (!a.date && !b.date) return 0;
-          if (!a.date) return 1;
-          if (!b.date) return -1;
+          if (isUndated(a) && isUndated(b)) return 0;
+          if (isUndated(a)) return 1;
+          if (isUndated(b)) return -1;
           // 日付があるものは昇順（近い未来が上）
-          return a.date.localeCompare(b.date);
+          return a.date!.localeCompare(b.date!);
         }),
     };
   }, [schedules, selectedDate]);
+
+  const visibleFutureSchedules = showUndatedOnly
+    ? futureSchedules.filter(
+        (schedule) => schedule.date == null || schedule.date.trim() === ""
+      )
+    : futureSchedules;
 
   if (loading) {
     return (
@@ -180,6 +211,7 @@ export default function SchedulePage() {
             {selectedDate && (
               <section className="selected-date-section">
                 <ScheduleList
+                  key={selectedDate}
                   schedules={selectedDateSchedules}
                   emptyMessage={
                     <>
@@ -206,9 +238,25 @@ export default function SchedulePage() {
         {/* リスト -未来- タブ */}
         {activeTab === "future" && (
           <section className="tab-section">
+            <div className="future-schedule-filter">
+              <button
+                type="button"
+                className={`undated-toggle ${showUndatedOnly ? "active" : ""}`}
+                aria-pressed={showUndatedOnly}
+                onClick={() => setShowUndatedOnly((current) => !current)}
+              >
+                <CalendarX size={16} />
+                <span>日程未定のみ</span>
+              </button>
+            </div>
             <ScheduleList
-              schedules={futureSchedules}
-              emptyMessage="これからの予定はありません"
+              key={showUndatedOnly ? "undated" : "all"}
+              schedules={visibleFutureSchedules}
+              emptyMessage={
+                showUndatedOnly
+                  ? "日程未定の予定はありません"
+                  : "これからの予定はありません"
+              }
             />
           </section>
         )}

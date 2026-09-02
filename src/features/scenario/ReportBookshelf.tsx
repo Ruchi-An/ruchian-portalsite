@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useScenarioReports } from "./useScenarioReports";
 import "./ReportBookshelf.css";
+import Pagination, { ITEMS_PER_PAGE } from "../../components/Pagination";
 
 type GenreTheme = "murder" | "story" | "other";
 type GenreFilter = "all" | GenreTheme;
@@ -101,6 +102,7 @@ export default function ReportBookshelf() {
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
     searchParams.get("view") === "list" ? "list" : "bookshelf"
   );
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams);
@@ -138,6 +140,18 @@ export default function ReportBookshelf() {
       .map((report, index) => ({ ...report, number: index + 1 }));
   }, [reports, activeGenre]);
 
+  const handleGenreChange = (genre: GenreFilter) => {
+    setCurrentPage(1);
+    setActiveGenre(genre);
+  };
+
+  const totalPages = Math.ceil(displayReports.length / ITEMS_PER_PAGE);
+  const page = Math.min(currentPage, Math.max(totalPages, 1));
+  const visibleReports = displayReports.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -171,7 +185,7 @@ export default function ReportBookshelf() {
                   role="tab"
                   aria-selected={activeGenre === option.value}
                   className={`report-subtab-btn ${activeGenre === option.value ? "active" : ""} ${option.value === "all" ? "genre-all" : option.value === "murder" ? "genre-murder" : option.value === "story" ? "genre-story" : "genre-other"}`}
-                  onClick={() => setActiveGenre(option.value)}
+                  onClick={() => handleGenreChange(option.value)}
                 >
                   <Icon size={16} className="report-subtab-icon" />
                   <span>{option.label}</span>
@@ -202,6 +216,12 @@ export default function ReportBookshelf() {
         </div>
       </div>
 
+      <Pagination
+        currentPage={page}
+        totalItems={displayReports.length}
+        onPageChange={setCurrentPage}
+      />
+
       {displayReports.length === 0 ? (
         <div className="empty-schedule-box">
           <BookX className="empty-schedule-icon" />
@@ -209,7 +229,7 @@ export default function ReportBookshelf() {
         </div>
       ) : viewMode === "list" ? (
         <div className="report-list">
-          {displayReports.map((report) => {
+          {visibleReports.map((report) => {
             const rowTheme = resolveGenreTheme(report.genre);
 
             return (
@@ -228,7 +248,7 @@ export default function ReportBookshelf() {
         </div>
       ) : (
         <div className="bookshelf">
-          {displayReports.map((report) => (
+          {visibleReports.map((report) => (
             <BookCard
               key={report.scheduleId}
               number={report.number}
@@ -241,6 +261,11 @@ export default function ReportBookshelf() {
           ))}
         </div>
       )}
+      <Pagination
+        currentPage={page}
+        totalItems={displayReports.length}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

@@ -24,7 +24,7 @@ export type Schedule = {
     official_url: string | null;
   } | null;
 
-  date: string;
+  date: string | null;
   time: string | null;
 
   // 時間帯フラグ
