@@ -1,7 +1,3 @@
-.gm-available .report-view-switcher { margin-bottom: .5rem; }
-.gm-available .report-list-row {
-  grid-template-columns: 4.5rem minmax(0, 1fr);
-}
 .gm-filter-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin: .25rem 0 .5rem; }
 .gm-filter-buttons button { border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(15,20,35,.45); color: rgba(255,255,255,.65); padding: .35rem .7rem; cursor: pointer; }
 .gm-filter-buttons button.active { color: #fff; border-color: #fdff77; background: rgba(253,255,119,.18); }
