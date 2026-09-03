@@ -226,6 +226,18 @@
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+.report-list-number,
+.report-list-date {
+  white-space: nowrap;
+}
+
+.report-list-title {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* 背表紙ライン（主張を抑えてソフトに） */
 .report-list-row::before {
   content: "";

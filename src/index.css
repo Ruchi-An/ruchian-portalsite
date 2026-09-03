@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Yomogi&display=swap');
 @import "tailwindcss";
 
-/* けいなんポップ体の読み込み定義（「ー」「」は端末標準フォントへフォールバック） */
+/* けいなんポップ体の読み込み定義（句読点・長音・かぎ括弧は端末標準フォントへフォールバック） */
 @font-face {
   font-family: 'KeinanPop';
   src: url('/KeinanPop.ttf') format('truetype');
   font-display: swap;
-  /* ★ 崩れやすい長音・かぎ括弧以外の文字にだけけいなんポップを適用する */
-  unicode-range: U+0000-300B, U+300E-30FB, U+30FD-10FFFF;
+  /* ★ 崩れやすい句読点・長音・かぎ括弧以外の文字にだけ適用する */
+  unicode-range: U+0000-3000, U+3003-300B, U+300E-30FB, U+30FD-10FFFF;
 }
 
 /* 3. クラス定義 */
