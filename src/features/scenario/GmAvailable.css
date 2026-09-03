@@ -1,0 +1,26 @@
+.gm-available .report-view-switcher { margin-bottom: .5rem; }
+.gm-available .report-list-row {
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+}
+.gm-available .report-list-date,
+.gm-available .report-list-title {
+  min-width: 0;
+  white-space: nowrap;
+}
+.gm-available .report-list-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gm-filter-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin: .25rem 0 .5rem; }
+.gm-filter-buttons button { border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(15,20,35,.45); color: rgba(255,255,255,.65); padding: .35rem .7rem; cursor: pointer; }
+.gm-filter-buttons button.active { color: #fff; border-color: #fdff77; background: rgba(253,255,119,.18); }
+.gm-text-section { color: rgba(255,255,255,.86); }
+.gm-text-section h2 { margin: .9rem 0 .35rem; color: #fdff77; font-size: 1.05rem; }
+.gm-text-section p { margin: 0; white-space: pre-wrap; line-height: 1.8; }
+.gm-detail .report-detail-body { gap: .7rem; }
+
+@media (max-width: 480px) {
+  .gm-available .report-list-row {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+  }
+}

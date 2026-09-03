@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="site-header-inner">
-        <h1 className="site-title font-yomogi">
+        <h1 className="site-title font-pop">
           星降る止まり木
         </h1>
 

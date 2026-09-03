@@ -1,9 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Yomogi&display=swap');
 @import "tailwindcss";
 
-/* 1. Yomogiフォントの読み込み */
-@import url('https://fonts.googleapis.com/css2?family=Yomogi&display=swap');
-
-/* 2. けいなんポップ体の読み込み定義（「ー」だけ除外する魔法を指定） */
+/* けいなんポップ体の読み込み定義（「ー」だけ除外する魔法を指定） */
 @font-face {
   font-family: 'KeinanPop';
   src: url('/KeinanPop.ttf') format('truetype');
@@ -29,6 +27,17 @@ body,
   margin: 0;
   min-height: 100%;
   background-color: #0a0f24 !important; /* ★ #030712 から夜空ネイビーへ変更 */
+}
+
+body {
+  font-family: 'Yomogi', cursive, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 html {

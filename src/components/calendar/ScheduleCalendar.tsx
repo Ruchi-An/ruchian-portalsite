@@ -63,7 +63,7 @@ export default function ScheduleCalendar({
   };
 
   return (
-    <div className="schedule-calendar font-pop">
+    <div className="schedule-calendar font-yomogi">
       {/* 自作ヘッダー */}
       <div className="calendar-header">
         <button

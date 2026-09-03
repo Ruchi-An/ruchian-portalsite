@@ -66,6 +66,11 @@
   font-weight: 500;
 }
 
+.report-detail-scenario-tag svg {
+  color: #c4a8ff;
+  flex-shrink: 0;
+}
+
 /* ジャンルカラー */
 .schedule-genre-mystery {
   background: rgba(248, 113, 113, 0.3);
@@ -193,6 +198,17 @@
   cursor: not-allowed;
   opacity: 0.7;
   pointer-events: none;
+}
+
+.gm-history-stream-btn {
+  margin: 0 auto;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 639px) {
+  .gm-history-stream-btn {
+    padding: 0.3rem 0.55rem;
+  }
 }
 
 /* -------------------------------------------------------------

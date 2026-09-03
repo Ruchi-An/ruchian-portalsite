@@ -119,7 +119,7 @@ export default function ScheduleCard({ schedule }: Props) {
         <div className="schedule-card-body">
           
           {/* タグエリア */}
-          <div className="schedule-card-tags font-yomogi">
+          <div className="schedule-card-tags font-pop">
             {schedule.category && (
               <span className={`schedule-category-tag ${getCategoryStyle(schedule.category)}`}>
                 <span className="truncate">

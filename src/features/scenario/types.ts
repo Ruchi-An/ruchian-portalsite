@@ -27,6 +27,7 @@ export type ReportCast = {
 export type ScenarioDetailInfo = {
   title: string;
   genre: string | null;
+  playerCount?: string | null;
   production: string | null;
   productionUrl: string | null;
   creator: string | null;
@@ -52,4 +53,26 @@ export type ScenarioReportDetail = {
   streamUrl: string | null;
   scenario: ScenarioDetailInfo | null;
   cast: ReportCast[];
+};
+
+export type GmScenarioListItem = {
+  scenarioId: string;
+  title: string;
+  genre: string | null;
+  playerCount: string | null;
+  scenarioTag: string | null;
+  trailerUrl: string | null;
+};
+
+export type GmTableHistory = {
+  scheduleId: string;
+  date: string;
+  members: string[];
+  streamUrl: string | null;
+};
+
+export type GmScenarioDetail = {
+  scenarioId: string;
+  scenario: ScenarioDetailInfo;
+  history: GmTableHistory[];
 };

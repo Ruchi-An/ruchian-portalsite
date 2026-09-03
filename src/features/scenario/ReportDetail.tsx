@@ -16,6 +16,7 @@ import {
   Image as ImageIcon, // 💡 エンドカード用アイコンを追加
 } from "lucide-react";
 import { useScenarioReportDetail } from "./useScenarioReportDetail";
+import { confirmSpoilerWarning } from "./spoilerWarning";
 import WatermarkedImage from "../../WatermarkedImage";
 import "./ReportDetail.css";
 
@@ -87,10 +88,7 @@ export default function ReportDetail() {
   const isStreamEnabled = Boolean(detail?.stream) && Boolean(detail?.streamUrl);
 
   const handleStreamClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const isConfirmed = window.confirm(
-      "⚠️ ネタバレ注意 ⚠️\n\nこの配信はシナリオ（マダミス・ストプレ等）のネタバレを含みます。\n通過済み、または今後プレイ予定のない方のみご視聴ください。\n\n配信ページを開きますか？"
-    );
-    if (!isConfirmed) {
+    if (!confirmSpoilerWarning()) {
       e.preventDefault();
     }
   };
