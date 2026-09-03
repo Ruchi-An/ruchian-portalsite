@@ -14,14 +14,24 @@ html, body {
 .app-viewport {
   min-height: 100vh;
   background-color: #0a0f24;
-  background-image: url('/star-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+/* 最背面の星空画像だけをぼかし、前景のコンテンツは鮮明に保つ */
+.app-viewport::before {
+  content: "";
+  position: fixed;
+  inset: -8px;
+  background-image: url('/star-bg.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ローディング画面（画面全体を覆うように変更） */

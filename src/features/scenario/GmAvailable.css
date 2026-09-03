@@ -18,6 +18,11 @@
 .gm-text-section h2 { margin: .9rem 0 .35rem; color: #fdff77; font-size: 1.05rem; }
 .gm-text-section p { margin: 0; white-space: pre-wrap; line-height: 1.8; }
 .gm-detail .report-detail-body { gap: .7rem; }
+.gm-detail .gm-official-links { width: 100%; }
+.gm-detail .gm-official-links .official-btn {
+  width: 100%;
+  justify-content: center;
+}
 
 @media (max-width: 480px) {
   .gm-available .report-list-row {
